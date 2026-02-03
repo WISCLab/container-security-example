@@ -30,7 +30,7 @@ The containers in this project already run as a non-root user, but the Docker **
 
 ```bash
 # Make migrations locally (using the pinned version)
-pip install django==4.2.28 & python manage.py makemigrations todos
+pip install django==4.2.28 && python manage.py makemigrations todos
 
 # If you're on linux
 ./deployment-scripts/deploy-linux.sh
