@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo List</title>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: 40px auto; padding: 0 20px; }
+        h1 { margin-bottom: 20px; }
+        form { display: flex; gap: 8px; margin-bottom: 20px; }
+        input[type="text"] { flex: 1; padding: 8px; font-size: 16px; }
+        button { padding: 8px 16px; cursor: pointer; }
+        ul { list-style: none; padding: 0; }
+        li { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #eee; }
+        .completed { text-decoration: line-through; color: #999; }
+        .task-title { flex: 1; }
+        .btn-delete { background: #e74c3c; color: white; border: none; border-radius: 4px; }
+        .btn-toggle { background: #3498db; color: white; border: none; border-radius: 4px; }
+        .btn-add { background: #2ecc71; color: white; border: none; border-radius: 4px; }
+        .mount-indicator { padding: 8px 12px; border-radius: 4px; margin-bottom: 20px; font-size: 14px; }
+        .mount-active { background: #ffeaa7; border: 1px solid #fdcb6e; color: #856404; }
+        .mount-inactive { background: #dfe6e9; border: 1px solid #b2bec3; color: #636e72; }
+    </style>
+</head>
+<body>
+    <h1>Todo List</h1>
+    {% if host_mount_active %}
+    <div class="mount-indicator mount-active">Host filesystem mounted at /mnt/host-data</div>
+    {% else %}
+    <div class="mount-indicator mount-inactive">No host filesystem mounted</div>
+    {% endif %}
+    <form method="post" action="{% url 'task_list' %}">
+        {% csrf_token %}
+        <input type="text" name="title" placeholder="New task..." required>
+        <button type="submit" class="btn-add">Add</button>
+    </form>
+    <ul>
+        {% for task in tasks %}
+        <li>
+            <a href="{% url 'toggle_task' task.pk %}">
+                <button class="btn-toggle">{% if task.completed %}Undo{% else %}Done{% endif %}</button>
+            </a>
+            <span class="task-title {% if task.completed %}completed{% endif %}">{{ task.title }}</span>
+            <a href="{% url 'delete_task' task.pk %}">
+                <button class="btn-delete">Delete</button>
+            </a>
+        </li>
+        {% empty %}
+        <li>No tasks yet.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

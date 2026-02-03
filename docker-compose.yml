@@ -1,0 +1,27 @@
+services:
+  web:
+    build: .
+    # <DAEMON-ATTACK-SURFACE> Secrets and config passed via environment (not baked into the image)
+    environment:
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY:?Set DJANGO_SECRET_KEY in .env or shell}
+      - DJANGO_DEBUG=False
+      - DJANGO_ALLOWED_HOSTS=localhost
+    ports:
+      - "8000:8000"
+    volumes:
+      # <CONTAINER-HARDENING>
+      # Host volume :ro (read-only)
+      # App can't modify files on the host
+      - ~/Data:/mnt/host-data:ro
+      # Bind-mount local db directory so SQLite data persists across restarts
+      - ./db:/app/db
+    # <CONTAINER-HARDENING> Sets daemon's root filesystem as read-only
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      # <KERNEL-CAPABILITIES> Prevents processes from gaining new privileges (setuid, ambient capabilities, etc.)
+      - no-new-privileges:true
+    # <KERNEL-CAPABILITIES> Removes capabilities like NET_RAW (packet sniffing), SYS_ADMIN, etc.
+    cap_drop:
+      - ALL
